@@ -33,8 +33,9 @@ public class main {
 
         
         bank.setVisible(true);
-		
-		
+        
+        
+        
 	}
 
 }
