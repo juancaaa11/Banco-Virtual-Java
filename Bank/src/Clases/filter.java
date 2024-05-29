@@ -10,6 +10,9 @@
 
 package Clases;
 
+/*
+*Esto es una clase filtro, consiste en 4 funciones para reemplazar la variable String  de un JTextField y cambiar a double. Esto solo lo utilizo para actualizar el dinero en mi base de datos! 
+*/
 
 import javax.swing.text.AttributeSet;
 import javax.swing.text.BadLocationException;

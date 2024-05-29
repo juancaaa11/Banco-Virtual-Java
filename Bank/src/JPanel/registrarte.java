@@ -11,6 +11,8 @@
 package JPanel;
 
 import java.awt.Color;
+import java.awt.Desktop;
+
 import Consultas.consultas;
 import java.awt.Font;
 import java.awt.SystemColor;
@@ -36,10 +38,12 @@ import Clases.SessionManager;
 import Clases.personas;
 import Consultas.consultas;
 import java.awt.event.ActionListener;
+import java.io.*;
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.Random;
 import java.awt.event.ActionEvent;
+import javax.swing.JCheckBox;
 
 public class registrarte extends JPanel {
 
@@ -56,6 +60,9 @@ public class registrarte extends JPanel {
 	private JTextArea textNombre;
 	private JTextField txtNombre;
 	private JTextField txtUsuario;
+	private boolean terminos;
+	
+	
 	
     public static String generarNumeroCuenta(int longitud) {
         // Definir los dígitos válidos para el número de cuenta (0-9)
@@ -85,10 +92,67 @@ public class registrarte extends JPanel {
 	 * Create the panel.
 	 */
 	public registrarte() {
+		
+		terminos=false;
 
 		setBorder(new LineBorder(new Color(0, 0, 0), 4, true));
 		setBackground(SystemColor.textHighlight);
 		setLayout(null);
+		
+		JCheckBox chckbxNewCheckBox = new JCheckBox("");
+		chckbxNewCheckBox.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				
+				if (terminos==false) {
+					
+					terminos=true;
+					
+				} else {
+					
+					terminos=false;
+					
+			    }
+				
+			}
+		});
+		chckbxNewCheckBox.setBackground(SystemColor.textHighlight);
+		chckbxNewCheckBox.setForeground(SystemColor.desktop);
+		chckbxNewCheckBox.setBounds(397, 449, 21, 25);
+		add(chckbxNewCheckBox);
+		
+		JButton terminosbank = new JButton("Acepto terminos y Condiciones");
+		terminosbank.setBorder(new MatteBorder(0, 0, 1, 0, (Color) new Color(0, 0, 0)));
+		terminosbank.setBackground(SystemColor.textHighlight);
+		terminosbank.setFont(new Font("Verdana", Font.PLAIN, 13));
+		terminosbank.setForeground(SystemColor.windowText);
+		terminosbank.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				
+				
+				File terminos = new File(".\\src\\Archivos\\terminos_bank.pdf");
+				
+				if (terminos.exists()) {
+					
+					try {
+						
+						Desktop.getDesktop().open(terminos);
+					}catch (IOException a1) {
+						
+						a1.printStackTrace();
+					}
+					
+				} else {
+					
+					JOptionPane.showMessageDialog(null,"Terminos no existentes!");
+				}
+				
+			}
+		});
+		
+		
+		terminosbank.setBounds(424, 449, 205, 23);
+		add(terminosbank);
+		
 		
 		txtRegistrarse = new JTextField();
 		txtRegistrarse.setForeground(SystemColor.desktop);
@@ -223,23 +287,30 @@ public class registrarte extends JPanel {
 			
 			public void actionPerformed(ActionEvent e) {
 				
+				
+				if (terminos) {
+				
 				String usuario = textUsuario.getText();
-                String contrasena = new String(passwordField.getPassword());
-                String apellido1 = textApellido1.getText();
-                String apellido2 = textApellido2.getText();
-                String telefono = textTelefono.getText();
-                String dni = textDNI.getText();
-                String nombre = textNombre.getText();
+                String contrasena = new String(passwordField.getPassword()).trim();
+                String apellido1 = textApellido1.getText().trim();
+                String apellido2 = textApellido2.getText().trim();
+                String telefono = textTelefono.getText().trim();
+                String dni = textDNI.getText().trim();
+                String nombre = textNombre.getText().trim();
                 String num_cuenta = generarNumeroCuenta(10);
                 double dinero_disp = 0.00;
                
                 
                 
+                if (usuario.isEmpty() || contrasena.isEmpty() || apellido1.isEmpty() || 
+                        apellido2.isEmpty() || telefono.isEmpty() || dni.isEmpty() || nombre.isEmpty()) {
+                        JOptionPane.showMessageDialog(null, "Todos los campos son obligatorios. Por favor, complete todos los campos.");
+                        return; 
+                    } 
+                
                 consultas consultas = new consultas();
                 
-                // Guardar los datos en variables para usar en la lógica de registro o verificación
-             
-				
+                				
                 
                 boolean registro = consultas.registrarUsuario(usuario, contrasena, apellido1, apellido2, telefono, dni, nombre, num_cuenta, dinero_disp);
                 
@@ -268,7 +339,12 @@ public class registrarte extends JPanel {
                 	
                 	JOptionPane.showMessageDialog(null, "Error al registrase!");
                 }
-               
+                
+				} else {
+					
+					JOptionPane.showMessageDialog(null, "Acepte los terminos primero");
+					
+				}
             }
 				
 				
@@ -277,16 +353,11 @@ public class registrarte extends JPanel {
 		btnNewButton.setBorder(new LineBorder(new Color(0, 0, 0), 2, true));
 		btnNewButton.setBackground(SystemColor.textHighlight);
 		btnNewButton.setFont(new Font("Arial Black", Font.PLAIN, 12));
-		btnNewButton.setBounds(292, 451, 89, 23);
+		btnNewButton.setBounds(279, 451, 89, 23);
 		add(btnNewButton);
-
-		
-		JLabel Logo = new JLabel("");
-		Logo.setIcon(new ImageIcon(".//src//Imagenes//logo.png"));
-		Logo.setBounds(334, 173, 454, 398);
-		add(Logo);
 		
 		txtauthorJuancaaaversion = new JTextField();
+		txtauthorJuancaaaversion.setForeground(Color.BLACK);
 		txtauthorJuancaaaversion.setEditable(false);
 		txtauthorJuancaaaversion.setBorder(null);
 		txtauthorJuancaaaversion.setBackground(SystemColor.textHighlight);
@@ -313,6 +384,11 @@ public class registrarte extends JPanel {
 		add(txtNombre);
 		txtNombre.setColumns(10);
 		
+		JLabel Logo = new JLabel("");
+		Logo.setIcon(new ImageIcon(".//src//Imagenes//logopeque.png"));
+		Logo.setBounds(627, 484, 63, 55);
+		add(Logo);
+		
 		JButton btnAtras = new JButton("ATRAS");
 		btnAtras.setIcon(null);
 		btnAtras.setForeground(SystemColor.desktop);
@@ -320,6 +396,8 @@ public class registrarte extends JPanel {
 		btnAtras.setFont(new Font("FiraCode Nerd Font Mono", Font.BOLD, 23));
 		btnAtras.setBounds(557, 143, 118, 28);
 		add(btnAtras);
+		
+		
 		btnAtras.addActionListener(new ActionListener() {
 			
 			public void actionPerformed(ActionEvent e) {
@@ -349,6 +427,7 @@ public class registrarte extends JPanel {
 			
 			
 		});
+		
 	
 		
 		

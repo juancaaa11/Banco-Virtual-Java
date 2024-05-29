@@ -28,7 +28,7 @@ import Clases.SessionManager;
 import Clases.filter;
 import Clases.personas;
 import Consultas.consultas;
-
+import java.time.*;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.ImageIcon;
@@ -82,7 +82,7 @@ public class bizum extends JPanel {
 		txtBank.setColumns(10);
 		
 		JLabel Bizum = new JLabel("");
-		Bizum.setIcon(new ImageIcon(".//src//Imagenes//Bizum (1).png"));
+		Bizum.setIcon(new ImageIcon(".//src//Imagenes//Bizum.png"));
 		Bizum.setBounds(241, 143, 181, 77);
 		add(Bizum);
 	
@@ -129,7 +129,8 @@ public class bizum extends JPanel {
 	                if (bizum) {
 	                	
 	                	
-	                	JOptionPane.showMessageDialog(null,"Bizum realizado correctamente");
+	                	String telefonoEnvio = consultas.obtenerTelefono(informacionUsuario);
+	                	consultas.registro(telefonoEnvio, personaEnvio, Dinero);
 	                	actualizarDineroDisponible();
 	          
 	                	

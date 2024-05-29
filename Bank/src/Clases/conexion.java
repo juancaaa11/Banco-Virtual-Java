@@ -10,6 +10,10 @@
 
 package Clases;
 
+/*
+ * Clase conexion para realizar el enlace con la base de datos.
+ */
+
 
 import java.sql.Connection;
 import java.sql.DriverManager;

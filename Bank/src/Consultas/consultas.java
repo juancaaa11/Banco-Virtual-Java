@@ -10,9 +10,19 @@
 
 package Consultas;
 
-import java.sql.Connection;
-import java.sql.SQLException;
+/*
+ * Clase consultas. Esta clase es utilizada para realizar funciones relacionadas con SQL. Estas consisten en consultas, insertacion y modificacion de mis datos con la base de datos localhost.
+ */
 
+import java.awt.Color;
+import java.awt.Font;
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.SQLException;
+import java.sql.Timestamp;
+import java.time.LocalDateTime;
+
+import javax.swing.JButton;
 import javax.swing.JOptionPane;
 
 
@@ -73,6 +83,7 @@ public class consultas {
 
 	
 	public static boolean actualizarNumeroTelefono(String nombreUsuario, String nuevoTelefono) {
+		
 	    Connection connection = null;
 	    PreparedStatement ps = null;
 	    boolean actualizado = false;
@@ -158,6 +169,57 @@ public class consultas {
 	}
 
 	
+	public static boolean registro(String telefonoEnvio, String telefonoDestino, Double Dinero) {
+		
+	    Connection connection = null;
+	    PreparedStatement ps = null;
+	    boolean resultado = false;
+
+	    try {
+	        connection = new conexion().getConnection();
+
+	        // Consulta para obtener los detalles del destinatario
+	        String consultaDetalles = "SELECT nombre, apellido1, apellido2 FROM personas WHERE numero_telefono = ?";
+	        PreparedStatement psDetalles = connection.prepareStatement(consultaDetalles);
+	        psDetalles.setString(1, telefonoDestino);
+	        ResultSet rsDetalles = psDetalles.executeQuery();
+
+	        if (rsDetalles.next()) {
+	            String nombre = rsDetalles.getString("nombre");
+	            String apellido1 = rsDetalles.getString("apellido1");
+	            String apellido2 = rsDetalles.getString("apellido2");
+	            String nombreCompleto = nombre + " " + apellido1 + " " + apellido2;
+
+	            // Usar la consulta SQL con NOW() para establecer la fecha y hora
+	            String sql = "INSERT INTO registro (telefono_envio, telefono_destino, fecha_hora, cantidad) VALUES (?, ?, NOW(), ?)";
+	            PreparedStatement pstmt = connection.prepareStatement(sql);
+	            pstmt.setString(1, telefonoEnvio);
+	            pstmt.setString(2, telefonoDestino);
+	            pstmt.setDouble(3, Dinero);
+	            pstmt.executeUpdate();
+
+	            JOptionPane.showMessageDialog(null, "Bizum realizado correctamente a " + nombreCompleto + " (Tel: +34 " + telefonoDestino + ")");
+	            pstmt.close();
+	            resultado = true;
+	        } else {
+	            JOptionPane.showMessageDialog(null, "Bizum no enviado. Teléfono de destino no encontrado.");
+	        }
+
+	        rsDetalles.close();
+	        psDetalles.close();
+	        connection.close();
+	    } catch (SQLException e) {
+	        e.printStackTrace();
+	        JOptionPane.showMessageDialog(null, "Bizum no enviado, error al enviar (Compruebe los datos!).");
+	        return false;
+	    }
+
+	    return resultado;
+	}
+
+
+	
+	
 	private static String formatNumberWithDashes(long number) {
 		
 	    String numberStr = Long.toString(number);
@@ -178,6 +240,7 @@ public class consultas {
 	
 	
 	public static boolean actualizarNombreUsuario(String nombreUsuario, String nuevoNombreUsuario) {
+		
 	    Connection connection = null;
 	    PreparedStatement ps = null;
 	    boolean actualizado = false;
@@ -345,6 +408,83 @@ public class consultas {
 
 	    return apellidoCompleto;
 	}
+	
+
+	
+
+	public static boolean verificarUsuario(String nombreUsuario) {
+		
+	    Connection connection = null;
+	    PreparedStatement ps = null;
+	    ResultSet rs = null;
+	    boolean usuarioExiste = false;
+
+	    try {
+	        connection = new conexion().getConnection();
+
+	        String queryVerificarUsuario = "SELECT COUNT(*) AS count FROM usuarios WHERE usuario = ?";
+	        
+	        ps = connection.prepareStatement(queryVerificarUsuario);
+	        ps.setString(1, nombreUsuario);
+	        rs = ps.executeQuery();
+
+	        if (rs.next() && rs.getInt("count") > 0) {
+	            usuarioExiste = true;
+	        } else {
+	            JOptionPane.showMessageDialog(null, "Usuario no encontrado.");
+	        }
+
+	    } catch (SQLException e) {
+	        e.printStackTrace();
+	    } finally {
+	        try {
+	            if (rs != null) rs.close();
+	            if (ps != null) ps.close();
+	            if (connection != null) connection.close();
+	        } catch (SQLException e) {
+	            e.printStackTrace();
+	        }
+	    }
+
+	    return usuarioExiste;
+	}
+
+	public static boolean actualizarContrasena(String nombreUsuario, String nuevaContrasena) {
+		
+	    Connection connection = null;
+	    PreparedStatement ps = null;
+	    boolean actualizacionExitosa = false;
+
+	    try {
+	        connection = new conexion().getConnection();
+
+	        String queryActualizarContrasena = "UPDATE usuarios SET contrasena = ? WHERE usuario = ?";
+	        
+	        ps = connection.prepareStatement(queryActualizarContrasena);
+	        ps.setString(1, nuevaContrasena);
+	        ps.setString(2, nombreUsuario);
+	        int filasActualizadas = ps.executeUpdate();
+
+	        if (filasActualizadas > 0) {
+	            actualizacionExitosa = true;
+	        } else {
+	            JOptionPane.showMessageDialog(null, "Error al actualizar la contraseña.");
+	        }
+
+	    } catch (SQLException e) {
+	        e.printStackTrace();
+	    } finally {
+	        try {
+	            if (ps != null) ps.close();
+	            if (connection != null) connection.close();
+	        } catch (SQLException e) {
+	            e.printStackTrace();
+	        }
+	    }
+
+	    return actualizacionExitosa;
+	}
+
 	
 	
 	
@@ -517,6 +657,7 @@ public class consultas {
     
     
     public static boolean bizum(String nombreUsuario, String telefonoDestino, double monto) {
+    	
         Connection connection = null;
         PreparedStatement ps = null;
         ResultSet rs = null;
@@ -675,7 +816,7 @@ public class consultas {
             ps.executeUpdate();
             ps.close();
             
-            JOptionPane.showMessageDialog(null, "Bizum realizado correctamente!");
+            JOptionPane.showMessageDialog(null, "Ingreso realizado correctamente!");
             return true;
 
         } catch (SQLException e) {

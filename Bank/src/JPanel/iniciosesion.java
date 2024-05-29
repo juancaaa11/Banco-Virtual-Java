@@ -16,6 +16,9 @@ import javax.swing.border.LineBorder;
 import javax.swing.JTextField;
 import javax.swing.UIManager;
 import java.awt.Font;
+import java.awt.KeyEventDispatcher;
+import java.awt.KeyboardFocusManager;
+
 import javax.swing.SwingConstants;
 import javax.swing.SwingUtilities;
 import javax.swing.JTextArea;
@@ -26,11 +29,16 @@ import javax.swing.DropMode;
 import java.awt.SystemColor;
 import java.awt.BorderLayout;
 import java.awt.Component;
+import java.awt.Desktop;
+
 import javax.swing.Box;
 import javax.swing.JPasswordField;
 import java.awt.Panel;
 import java.awt.Button;
 import java.awt.event.ActionListener;
+import java.awt.event.KeyEvent;
+import java.io.File;
+import java.io.IOException;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
@@ -88,6 +96,30 @@ public class iniciosesion extends JPanel {
 		txtInicioDeSesion.setBounds(220, 204, 238, 43);
 		add(txtInicioDeSesion);
 		txtInicioDeSesion.setColumns(10);
+		
+		JButton terminosbank = new JButton("\u00BFHas olvidado tu contrase\u00F1a?");
+		terminosbank.setBorder(new MatteBorder(0, 0, 1, 0, (Color) new Color(0, 0, 0)));
+		terminosbank.setBackground(SystemColor.textHighlight);
+		terminosbank.setFont(new Font("Verdana", Font.PLAIN, 13));
+		terminosbank.setForeground(SystemColor.windowText);
+		terminosbank.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				
+				JFrame frame = new JFrame("Recuperacion Contraseña ");
+
+                
+                JPanel panelRecuperacion = new recuperacion();
+                frame.getContentPane().add(panelRecuperacion);
+                frame.setSize(647,529);
+                frame.setLocationRelativeTo(null);
+                frame.setVisible(true);
+				
+			}	
+		});
+		
+		
+		terminosbank.setBounds(40, 452, 205, 23);
+		add(terminosbank);
 		
 		txtBank = new JTextField();
 		txtBank.setForeground(SystemColor.desktop);
@@ -147,6 +179,10 @@ public class iniciosesion extends JPanel {
 	                String contrasena = new String(passwordField.getPassword());
 	               
 	                
+	                if (usuario.isEmpty() || contrasena.isEmpty()) {
+	                        JOptionPane.showMessageDialog(null, "Todos los campos son obligatorios. Por favor, complete todos los campos.");
+	                        return; 
+	                    } 
 	                
 	                boolean credencialesCorrectas = consultas.verificarCredenciales(usuario, contrasena);
 	             
@@ -190,6 +226,7 @@ public class iniciosesion extends JPanel {
 		btnNewButton.setBounds(313, 418, 89, 23);
 		add(btnNewButton);
 
+		
 		
 		JLabel Logo = new JLabel("");
 		Logo.setIcon(new ImageIcon(".//src//Imagenes//logo.png"));

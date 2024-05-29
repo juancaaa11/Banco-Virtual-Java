@@ -23,6 +23,7 @@ import Clases.personas;
 import Consultas.consultas;
 
 import java.awt.Font;
+import javax.swing.UIManager;
 
 public class credito extends JPanel {
 
@@ -57,7 +58,7 @@ public class credito extends JPanel {
 		txtNumeroDeTarjeta.setEditable(false);
 		txtNumeroDeTarjeta.setBorder(null);
 		txtNumeroDeTarjeta.setForeground(Color.WHITE);
-		txtNumeroDeTarjeta.setBackground(new Color(231, 84, 87));
+		txtNumeroDeTarjeta.setBackground(new Color(211,59,58,255));
 		txtNumeroDeTarjeta.setFont(new Font("Trebuchet MS", Font.BOLD, 16));
 		txtNumeroDeTarjeta.setText("Numero de Tarjeta");
 		txtNumeroDeTarjeta.setHorizontalAlignment(SwingConstants.CENTER);
@@ -73,7 +74,7 @@ public class credito extends JPanel {
 		txtNombreTitular.setFont(new Font("Trebuchet MS", Font.BOLD, 16));
 		txtNombreTitular.setColumns(10);
 		txtNombreTitular.setBorder(null);
-		txtNombreTitular.setBackground(new Color(231, 84, 87));
+		txtNombreTitular.setBackground(new Color(233, 70, 73, 255));
 		txtNombreTitular.setBounds(202, 32, 189, 20);
 		add(txtNombreTitular);
 		
@@ -92,7 +93,7 @@ public class credito extends JPanel {
 		numeroCuenta.setEditable(false);
 		numeroCuenta.setHorizontalAlignment(SwingConstants.CENTER);
 		numeroCuenta.setForeground(Color.BLACK);
-		numeroCuenta.setBackground(new Color(243, 5, 41));
+		numeroCuenta.setBackground(new Color(233, 70, 73, 255));
 		numeroCuenta.setBounds(21, 201, 330, 40);
 		add(numeroCuenta);
 		numeroCuenta.setColumns(10);
@@ -104,7 +105,7 @@ public class credito extends JPanel {
 		Nombre.setEditable(false);
 		Nombre.setHorizontalAlignment(SwingConstants.CENTER);
 		Nombre.setForeground(Color.BLACK);
-		Nombre.setBackground(new Color(243, 5, 41));
+		Nombre.setBackground(new Color(233, 70, 73, 255));
 		Nombre.setBounds(151, 63, 287, 52);
 		add(Nombre);
 		Nombre.setColumns(10);

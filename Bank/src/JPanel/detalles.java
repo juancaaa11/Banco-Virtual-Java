@@ -63,6 +63,7 @@ public class detalles extends JPanel {
 	/**
 	 * Create the panel.
 	 */
+	
 	public detalles() {
 		
 		consultas consultas = new consultas();

@@ -10,6 +10,11 @@
 
 package Clases;
 
+/*
+ * Clase personas, con sus respectivos atributos. La utilizo para poder aplicar el SessionManager sin errores.
+ * 
+ */
+
 public class personas {
 	
 	private String nombre;

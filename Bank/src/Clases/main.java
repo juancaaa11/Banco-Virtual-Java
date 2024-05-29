@@ -9,7 +9,9 @@
 
 
 package Clases;
-
+/*
+*Inicializa el Frame de Bienvenido.
+*/
 import javax.swing.JFrame;
 
 import JPanel.bienvenido;
