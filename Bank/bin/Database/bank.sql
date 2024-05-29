@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Servidor: 127.0.0.1
--- Tiempo de generación: 23-05-2024 a las 20:31:34
+-- Tiempo de generación: 29-05-2024 a las 01:44:38
 -- Versión del servidor: 10.4.32-MariaDB
 -- Versión de PHP: 8.2.12
 
@@ -20,13 +20,9 @@ SET time_zone = "+00:00";
 --
 -- Base de datos: `bank`
 --
-
--- --------------------------------------------------------
--- Crear la base de datos `bank`
 CREATE DATABASE IF NOT EXISTS `bank` DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci;
 
 USE `bank`;
-
 -- --------------------------------------------------------
 
 --
@@ -45,7 +41,9 @@ CREATE TABLE `contacto` (
 
 INSERT INTO `contacto` (`id`, `correo_electronico`, `mensaje`) VALUES
 (10, 'alfonsitoamor@gmail.com', 'Quiero trabajar con vosotros'),
-(11, 'juanca.jcglp26@gmail.com', 'quiero comprar esta empresa');
+(11, 'juanca.jcglp26@gmail.com', 'quiero comprar esta empresa'),
+(12, 'alfonsitoamor@gmail.com', 'hola me llamo juanca'),
+(13, 'lm715692@gmail.com', 'Hola necesito ayuda para pasar bizum ya que no me deja.');
 
 -- --------------------------------------------------------
 
@@ -64,8 +62,10 @@ CREATE TABLE `cuenta` (
 --
 
 INSERT INTO `cuenta` (`numero_cuenta`, `dinero_disponible`, `usuario_id`) VALUES
-(5169924165, 150.00, 1),
-(9445883102, 1000.00, 4);
+(5169924165, 514.00, 1),
+(7893799256, 200.00, 5),
+(8375528305, 0.00, 6),
+(9445883102, 1386.00, 4);
 
 -- --------------------------------------------------------
 
@@ -87,8 +87,34 @@ CREATE TABLE `personas` (
 --
 
 INSERT INTO `personas` (`dni`, `nombre`, `apellido1`, `apellido2`, `numero_telefono`, `usuario_id`) VALUES
+('52145362L', 'Marcos', 'Blazquez', 'Cano', '633213205', 5),
+('54332992T', 'Laura', 'Moreno', 'Parralejo', '684220577', 6),
 ('80239635H', 'Juan Carlos', 'Gonzalez', 'Pino', '691667626', 1),
 ('90876354L', 'Maria Isabel', 'Pino', 'Tejeda', '691691543', 4);
+
+-- --------------------------------------------------------
+
+--
+-- Estructura de tabla para la tabla `registro`
+--
+
+CREATE TABLE `registro` (
+  `id` int(11) NOT NULL,
+  `telefono_envio` varchar(20) NOT NULL,
+  `telefono_destino` varchar(20) NOT NULL,
+  `fecha_hora` datetime NOT NULL,
+  `cantidad` decimal(15,2) NOT NULL DEFAULT 0.00
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Volcado de datos para la tabla `registro`
+--
+
+INSERT INTO `registro` (`id`, `telefono_envio`, `telefono_destino`, `fecha_hora`, `cantidad`) VALUES
+(8, '691667626', '691691543', '2024-05-28 20:36:09', 1.00),
+(9, '691667626', '691691543', '2024-05-28 23:47:46', 1.00),
+(10, '684220577', '691667626', '2024-05-28 23:53:05', 250.00),
+(11, '684220577', '691667626', '2024-05-28 23:53:57', 250.00);
 
 -- --------------------------------------------------------
 
@@ -108,7 +134,9 @@ CREATE TABLE `usuarios` (
 
 INSERT INTO `usuarios` (`id`, `usuario`, `contrasena`) VALUES
 (1, 'juancaaa11', 'juancaaa'),
-(4, 'isabel', 'isabel');
+(4, 'isabel', 'isabel'),
+(5, 'maarkitos', 'marcos'),
+(6, 'lauramoreno', 'laurita');
 
 --
 -- Índices para tablas volcadas
@@ -136,6 +164,12 @@ ALTER TABLE `personas`
   ADD KEY `usuario_id` (`usuario_id`);
 
 --
+-- Indices de la tabla `registro`
+--
+ALTER TABLE `registro`
+  ADD PRIMARY KEY (`id`);
+
+--
 -- Indices de la tabla `usuarios`
 --
 ALTER TABLE `usuarios`
@@ -150,7 +184,7 @@ ALTER TABLE `usuarios`
 -- AUTO_INCREMENT de la tabla `contacto`
 --
 ALTER TABLE `contacto`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=12;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=14;
 
 --
 -- AUTO_INCREMENT de la tabla `cuenta`
@@ -159,10 +193,16 @@ ALTER TABLE `cuenta`
   MODIFY `numero_cuenta` bigint(20) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=9445883103;
 
 --
+-- AUTO_INCREMENT de la tabla `registro`
+--
+ALTER TABLE `registro`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=12;
+
+--
 -- AUTO_INCREMENT de la tabla `usuarios`
 --
 ALTER TABLE `usuarios`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=7;
 
 --
 -- Restricciones para tablas volcadas
@@ -185,31 +225,17 @@ COMMIT;
 /*!40101 SET CHARACTER_SET_RESULTS=@OLD_CHARACTER_SET_RESULTS */;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 
-
--- --------------------------------------------------------
--- Crear un nuevo usuario en la base de datos
 CREATE USER IF NOT EXISTS 'user'@'localhost' IDENTIFIED BY 'userbank';
 
--- Asignar permisos al usuario para insertar y consultar en todas las tablas
-GRANT SELECT, INSERT ON bank.* TO 'user'@'localhost';
 
--- Permitir al usuario actualizar solo la columna dinero_disponible en la tabla cuenta
-GRANT UPDATE (dinero_disponible) ON bank.cuenta TO 'user'@'localhost';
+GRANT SELECT, INSERT ON `bank`.* TO `user`@`localhost`;
 
--- Permitir al usuario actualizar la columna numero_telefono en la tabla personas
-GRANT UPDATE (numero_telefono) ON bank.personas TO 'user'@'localhost';
+GRANT INSERT ON `bank`.`contacto` TO `user`@`localhost`;
 
--- Permitir al usuario actualizar la columna usuario en la tabla usuarios
-GRANT UPDATE (usuario) ON bank.usuarios TO 'user'@'localhost';
+GRANT INSERT ON `bank`.`registro` TO `user`@`localhost`;
 
--- Revocar los permisos para eliminar datos de la base de datos
-REVOKE DELETE ON bank.* FROM 'user'@'localhost';
+GRANT UPDATE (`dinero_disponible`) ON `bank`.`cuenta` TO `user`@`localhost`;
 
--- Aplicar los cambios de privilegios
-FLUSH PRIVILEGES;
+GRANT UPDATE, UPDATE (`numero_telefono`) ON `bank`.`personas` TO `user`@`localhost`;
 
-COMMIT;
-
-/*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
-/*!40101 SET CHARACTER_SET_RESULTS=@OLD_CHARACTER_SET_RESULTS */;
-/*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
+GRANT UPDATE, UPDATE (`usuario`) ON `bank`.`usuarios` TO `user`@`localhost`;
