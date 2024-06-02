@@ -113,7 +113,7 @@ public class iniciosesion extends JPanel {
                 frame.setSize(647,529);
                 frame.setLocationRelativeTo(null);
                 frame.setVisible(true);
-				
+                frame.setIconImage(new ImageIcon("src/Imagenes/logo.png").getImage());
 			}	
 		});
 		

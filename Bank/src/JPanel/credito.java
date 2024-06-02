@@ -39,6 +39,7 @@ public class credito extends JPanel {
 	 */
 	public credito() {
 		
+		
 		consultas consultas = new consultas();
 		
 		personas usuarioActivo = SessionManager.getUsuarioActivo();

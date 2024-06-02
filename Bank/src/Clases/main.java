@@ -26,7 +26,7 @@ public class main {
 		 JFrame bank = new JFrame("Bank!");
 
 	        // Configurar el JFrame
-	        bank.setIconImage(new ImageIcon(".//src/Imagenes/logo.png").getImage()); // Ruta relativa corregida
+	        bank.setIconImage(new ImageIcon("src/Imagenes/logo.png").getImage()); // Ruta relativa corregida
 	        bank.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 	        bank.setSize(718, 590);
 	        bank.setLocationRelativeTo(null); // Centrar el JFrame en la pantalla

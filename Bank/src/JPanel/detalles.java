@@ -360,6 +360,7 @@ public class detalles extends JPanel {
                 frame.setSize(486,350);
                 frame.setLocationRelativeTo(null);
                 frame.setVisible(true);
+                frame.setIconImage(new ImageIcon("src/Imagenes/logo.png").getImage());
 				
 				
 			}
