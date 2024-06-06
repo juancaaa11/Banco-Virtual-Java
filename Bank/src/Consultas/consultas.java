@@ -35,6 +35,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 
 import Clases.conexion;
+import Clases.passwordUtils;
 import Clases.personas;
 
 
@@ -449,163 +450,152 @@ public class consultas {
 	    return usuarioExiste;
 	}
 
-	public static boolean actualizarContrasena(String nombreUsuario, String nuevaContrasena) {
-		
-	    Connection connection = null;
-	    PreparedStatement ps = null;
-	    boolean actualizacionExitosa = false;
 
-	    try {
-	        connection = new conexion().getConnection();
+	 public static boolean actualizarContrasena(String nombreUsuario, String nuevaContrasena) {
+	        Connection connection = null;
+	        PreparedStatement ps = null;
+	        boolean actualizacionExitosa = false;
 
-	        String queryActualizarContrasena = "UPDATE usuarios SET contrasena = ? WHERE usuario = ?";
-	        
-	        ps = connection.prepareStatement(queryActualizarContrasena);
-	        ps.setString(1, nuevaContrasena);
-	        ps.setString(2, nombreUsuario);
-	        int filasActualizadas = ps.executeUpdate();
+	        try {
+	            connection = new conexion().getConnection();
 
-	        if (filasActualizadas > 0) {
-	            actualizacionExitosa = true;
-	        } else {
-	            JOptionPane.showMessageDialog(null, "Error al actualizar la contraseña.");
+	            // Hash de la nueva contraseña
+	            String hashedPassword = passwordUtils.hashPassword(nuevaContrasena);
+
+	            String queryActualizarContrasena = "UPDATE usuarios SET contrasena = ? WHERE usuario = ?";
+	            
+	            ps = connection.prepareStatement(queryActualizarContrasena);
+	            ps.setString(1, hashedPassword);  // Establecer la contraseña cifrada
+	            ps.setString(2, nombreUsuario);
+	            int filasActualizadas = ps.executeUpdate();
+
+	            if (filasActualizadas > 0) {
+	                actualizacionExitosa = true;
+	            } else {
+	                JOptionPane.showMessageDialog(null, "Error al actualizar la contraseña.");
+	            }
+
+	        } catch (SQLException e) {
+	            e.printStackTrace();
+	        } finally {
+	            try {
+	                if (ps != null) ps.close();
+	                if (connection != null) connection.close();
+	            } catch (SQLException e) {
+	                e.printStackTrace();
+	            }
 	        }
 
-	    } catch (SQLException e) {
-	        e.printStackTrace();
-	    } finally {
+	        return actualizacionExitosa;
+	    }
+	
+
+	
+	
+	
+	  public static boolean registrarUsuario(String usuario, String contrasena, String apellido1, String apellido2, String telefono, String dni, String nombre, String num_cuenta, double dinero_disp) {
+	        
+	        Connection conexion = null;
+	        PreparedStatement statement = null;
+	        ResultSet generatedKeys = null;
+	        
+	        boolean exito = false;
+	        
 	        try {
-	            if (ps != null) ps.close();
-	            if (connection != null) connection.close();
+	            conexion = new conexion().getConnection();
+
+	            // Hash de la contraseña antes de almacenarla
+	            String hashedPassword = passwordUtils.hashPassword(contrasena);
+
+	            // Insertar en la tabla usuarios
+	            String usuariosQuery = "INSERT INTO usuarios (usuario, contrasena) VALUES (?, ?)";
+	            statement = conexion.prepareStatement(usuariosQuery, PreparedStatement.RETURN_GENERATED_KEYS);
+	            statement.setString(1, usuario);
+	            statement.setString(2, hashedPassword);
+
+	            int filasInsertadasUsuarios = statement.executeUpdate();
+
+	            // Obtener el ID del usuario 
+	            int userId = -1;
+	            generatedKeys = statement.getGeneratedKeys();
+	            if (generatedKeys.next()) {
+	                userId = generatedKeys.getInt(1);
+	            } else {
+	                throw new SQLException("No se pudo obtener el ID del usuario insertado");
+	            }
+
+	            // Insertar en la tabla personas
+	            String personaQuery = "INSERT INTO personas (dni, nombre, apellido1, apellido2, numero_telefono, usuario_id) VALUES (?, ?, ?, ?, ?, ?)";
+	            statement = conexion.prepareStatement(personaQuery);
+	            statement.setString(1, dni);
+	            statement.setString(2, nombre);
+	            statement.setString(3, apellido1);
+	            statement.setString(4, apellido2);
+	            statement.setString(5, telefono);
+	            statement.setInt(6, userId);
+
+	            int filasInsertadasPersonas = statement.executeUpdate();
+
+	            // Insertar en la tabla cuenta
+	            String cuentaQuery = "INSERT INTO cuenta (numero_cuenta, dinero_disponible, usuario_id) VALUES (?, ?, ?)";
+	            statement = conexion.prepareStatement(cuentaQuery);
+	            statement.setString(1, num_cuenta);
+	            statement.setDouble(2, dinero_disp);
+	            statement.setInt(3, userId);
+
+	            int filasInsertadasCuentas = statement.executeUpdate();
+
+	            if (filasInsertadasCuentas > 0 && filasInsertadasPersonas > 0 && filasInsertadasUsuarios > 0) {
+	                JOptionPane.showMessageDialog(null, "Registro existoso!");
+	                exito = true;
+	            } else {
+	                JOptionPane.showMessageDialog(null, "Registro fallido!");
+	                exito = false;
+	            }
+
+	        } catch (SQLException e) {
+	            JOptionPane.showMessageDialog(null, "El registro no se completó: " + e.getMessage());
+	        } finally {
+	            try {
+	                if (generatedKeys != null) generatedKeys.close();
+	                if (statement != null) statement.close();
+	                if (conexion != null) conexion.close();
+	            } catch (SQLException e) {
+	                JOptionPane.showMessageDialog(null, "Error al cerrar recursos: " + e.getMessage());
+	            }
+	        }
+	        return exito;
+	    }
+	
+      
+	 public static boolean verificarCredenciales(String usuario, String contrasena) {
+		 
+	        conexion conexion = new conexion();
+	        
+	        String sql = "SELECT contrasena FROM usuarios WHERE usuario = ?";
+	        boolean loggedIn = false;
+
+	        try (Connection conn = conexion.getConnection();
+	             PreparedStatement pstmt = conn.prepareStatement(sql)) {
+	            
+	            pstmt.setString(1, usuario);
+	            
+	            ResultSet rs = pstmt.executeQuery();
+	            if (rs.next()) {
+	                String hashedPassword = rs.getString("contrasena");
+	                
+	                // Verificar la contraseña utilizando passwordUtils
+	                if (passwordUtils.checkPassword(contrasena, hashedPassword)) {
+	                    loggedIn = true;
+	                }
+	            }
+
 	        } catch (SQLException e) {
 	            e.printStackTrace();
 	        }
+
+	        return loggedIn;
 	    }
-
-	    return actualizacionExitosa;
-	}
-
-	
-	
-	
-	public static boolean registrarUsuario(String usuario, String contrasena, String apellido1, String apellido2, String telefono, String dni, String nombre, String num_cuenta, double dinero_disp) {
-        
-		Connection conexion = null;
-        PreparedStatement statement = null;
-        ResultSet generatedKeys = null;
-        
-        boolean exito=false;
-        
-        try {
-        	
-            
-        	conexion = new conexion().getConnection();
-
-        
-            String usuariosQuery = "INSERT INTO usuarios (usuario, contrasena) VALUES (?, ?)";
-            statement = conexion.prepareStatement(usuariosQuery, PreparedStatement.RETURN_GENERATED_KEYS);
-
-           
-            statement.setString(1, usuario);
-            statement.setString(2, contrasena);
-
-          
-            int filasInsertadasUsuarios = statement.executeUpdate();
-
-           
-            int userId = -1;
-            generatedKeys = statement.getGeneratedKeys();
-            if (generatedKeys.next()) {
-                userId = generatedKeys.getInt(1); 
-            } else {
-                throw new SQLException("No se pudo obtener el ID del usuario insertado");
-            }
-
-         
-            String personaQuery = "INSERT INTO personas (dni, nombre, apellido1, apellido2, numero_telefono, usuario_id) VALUES (?, ?, ?, ?, ?, ?)";
-            statement = conexion.prepareStatement(personaQuery);
-            statement.setString(1, dni);
-            statement.setString(2, nombre);
-            statement.setString(3, apellido1);
-            statement.setString(4, apellido2);
-            statement.setString(5, telefono);
-            statement.setInt(6, userId);
-
-            int filasInsertadasPersonas = statement.executeUpdate();
-
-           
-            String cuentaQuery = "INSERT INTO cuenta (numero_cuenta, dinero_disponible, usuario_id) VALUES (?, ?, ?)";
-            statement = conexion.prepareStatement(cuentaQuery);
-            statement.setString(1, num_cuenta);
-            statement.setDouble(2, dinero_disp);
-            statement.setInt(3, userId);
-
-            int filasInsertadasCuentas = statement.executeUpdate();
-    
-        
-        
-            if (filasInsertadasCuentas > 0 && filasInsertadasPersonas > 0 && filasInsertadasUsuarios > 0)  {
-            	JOptionPane.showMessageDialog(null, "Registro existoso!");
-            	exito= true;
-                
-            } else {
-            	JOptionPane.showMessageDialog(null, "Registro fallido!");
-            	exito=false;
-            }	
-               
-            }
-            
-                catch (SQLException e) {
-        	JOptionPane.showMessageDialog(null, "El registro no se completo: " + e.getMessage());
-           
-        } finally {
-          
-            if (statement != null) {
-                try {
-                    statement.close();
-                } catch (SQLException e) {
-                	JOptionPane.showMessageDialog(null, "Error al cerrar Stament");
-                }
-            }
-            if (conexion != null) {
-                try {
-                    conexion.close();
-                } catch (SQLException e) {
-                	JOptionPane.showMessageDialog(null, "Error al cerrar la conexion");
-                }
-            }
-        }
-        return exito;
-        }
-        
-	
-      
-	public static boolean verificarCredenciales(String usuario, String contrasena) {
-		
-		conexion conexion = new conexion();
-		
-		
-		String sql = "SELECT COUNT(*) FROM usuarios WHERE usuario = ? AND contrasena = ?";
-        boolean loggedIn = false;
-
-        try (Connection conn = conexion.getConnection();
-             PreparedStatement pstmt = conn.prepareStatement(sql)) {
-            
-            pstmt.setString(1, usuario);
-            pstmt.setString(2, contrasena);
-            
-            ResultSet rs = pstmt.executeQuery();
-            if (rs.next() && rs.getInt(1) > 0) {
-                loggedIn = true; 
-            }
-
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
-
-        return loggedIn;
-    }
-		
 		
 		
 	
