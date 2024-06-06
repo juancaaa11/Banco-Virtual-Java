@@ -20,7 +20,7 @@ set PHP_FILE=%SCRIPT_PATH%src\Database\contacto.php
 REM Definir el destino del archivo PHP
 set PHP_DEST="C:\xampp\htdocs\contacto.php"
 
-
+ 
 echo Iniciando la configuración...
 
 REM Verificar que el cliente de MySQL existe
@@ -44,17 +44,6 @@ if not exist "%PHP_FILE%" (
     exit /b 1
 )
 
-REM Crear la base de datos y las tablas
-echo Ejecutando el script SQL para crear la base de datos y las tablas...
-"%MYSQL_HOME%\mysql" -u %MYSQL_USER% -p < "%SQL_FILE%"
-if %errorlevel% neq 0 (
-    echo Error: No se pudo ejecutar el script SQL.
-    pause
-    exit /b 1
-)
-
-echo Script SQL ejecutado correctamente.
-
 REM Copiar el archivo PHP
 echo Copiando el archivo PHP a %PHP_DEST%...
 copy "%PHP_FILE%" %PHP_DEST%
@@ -65,6 +54,16 @@ if %errorlevel% neq 0 (
 )
 
 echo Archivo PHP copiado correctamente.
+
+
+REM Crear la base de datos y las tablas
+echo Ejecutando el script SQL para crear la base de datos y las tablas...
+"%MYSQL_HOME%\mysql.exe" -u %MYSQL_USER% -p < "%SQL_FILE%"
+if %errorlevel% neq 0 (
+    echo Error: No se pudo ejecutar el script SQL.
+    pause
+    exit /b 1
+)
 
 
 echo Configuración completada.

@@ -301,6 +301,7 @@ public class detalles extends JPanel {
 					
 					personas personas = new personas();
 					personas.setUsuario(nuevoUsuario);
+					SessionManager.cerrarSesion();
 					SessionManager.iniciarSesion(personas);
 					
 				}
